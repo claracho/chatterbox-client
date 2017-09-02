@@ -88,7 +88,8 @@ class App {
       var name = item.username;
       var room = item.roomname;
       var message = item.text;
-      return $(`<p class="post">${name} in ${room} said ${message}</p>`);
+      
+      return document.createTextNode(name + ' in ' + room + ' said ' + message);
     };
     $.ajax({
       type: 'GET',
@@ -99,7 +100,7 @@ class App {
         for (var i = 0; i < ajaxResponse.results.length; i++) {
           var post = ajaxResponse.results[i];
           var $post = something(post);
-          $('#chats').append($post);
+          $('#chats').append('<p class="post">', $post, '</p>');
         }
       }
     });
@@ -140,7 +141,6 @@ $('document').ready(function() {
   });
   app.fetch();
   // fetch and display data
-  console.log(data);
   // console.log(app.data);
   // app.data.forEach(function(item) {
   //   console.log(item);
