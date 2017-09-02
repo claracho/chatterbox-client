@@ -36,8 +36,8 @@
       username
       friends list
       
-    input field for collecting messages
-      button for posting message
+    X input field for collecting messages
+    X  button for posting message
     refresh functionality
     way to display existing rooms
       enter existing rooms
@@ -57,10 +57,12 @@
 
 */
 const url = 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages';
+var data;
 
 class App {
   constructor () {
     this.server = url;
+    this.data;
   }
 
   init() {
@@ -79,19 +81,25 @@ class App {
         alert('failed to send message', data);
       }
     });
-    alert('hi');
   }
 
   fetch() {
+    var something = function(item) {
+      var name = item.username;
+      var room = item.roomname;
+      var message = item.text;
+      return $(`<p class="post">${name} in ${room} said ${message}</p>`);
+    };
     $.ajax({
       type: 'GET',
-      //data: {results: 'resultsArray'},
       //data: 'where={"username": "Jon"}', 
       data: {'order': '-createdAt'},
       url: url,
-      success: function(data) {
-        for (var item of data.results) {
-          console.log(item);
+      success: function(ajaxResponse) {
+        for (var i = 0; i < ajaxResponse.results.length; i++) {
+          var post = ajaxResponse.results[i];
+          var $post = something(post);
+          $('#chats').append($post);
         }
       }
     });
@@ -103,6 +111,7 @@ class App {
   
   renderMessage(message) {
     $('#chats').append(`<p>${message}</p>`);
+
   }
   
   renderRoom(room) {
@@ -111,10 +120,14 @@ class App {
 
 }
 
-var app = new App();
+
 
 $('document').ready(function() {
   var values;
+
+  
+  var app = new App();
+  // send message when return key is pressed
   $('#chatInput').on('keypress', function(e) {
     if (e.keyCode === 13) {
       values = $('input').val();
@@ -125,7 +138,14 @@ $('document').ready(function() {
       app.send(message);
     }
   });
-
+  app.fetch();
+  // fetch and display data
+  console.log(data);
+  // console.log(app.data);
+  // app.data.forEach(function(item) {
+  //   console.log(item);
+  //   $('#chats').append(something(item));
+  // });
 });
 
 
