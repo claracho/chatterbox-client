@@ -57,12 +57,10 @@
 
 */
 const url = 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages';
-var data;
 
 class App {
   constructor () {
     this.server = url;
-    this.data;
   }
 
   init() {
@@ -75,10 +73,10 @@ class App {
       url: url,
       data: message,
       success: function(data) {
-        alert(`successfully submitted ${data}`);
+        console.log('successfully submitted', data);
       },
       error: function(data) {
-        alert('failed to send message', data);
+        console.log('failed to send message', data);
       }
     });
   }
@@ -88,8 +86,9 @@ class App {
       var name = item.username;
       var room = item.roomname;
       var message = item.text;
+      var time = item.createdAt;
       
-      return document.createTextNode(name + ' in ' + room + ' said ' + message);
+      return document.createTextNode(name + ' in ' + room + ' said ' + message + ' at ' + time);
     };
     $.ajax({
       type: 'GET',
@@ -122,24 +121,30 @@ class App {
 }
 
 
+var app = new App();
 
 $('document').ready(function() {
   var values;
 
-  
-  var app = new App();
   // send message when return key is pressed
-  $('#chatInput').on('keypress', function(e) {
-    if (e.keyCode === 13) {
-      values = $('input').val();
+  $('#chatInput').on('keypress', function(event) {
+    if (event.keyCode === 13) {
+      values = $('#chatMessage').val();
       var message = {};
       message.username = 'Jon';
       message.roomname = '4chan';
       message.text = values;
       app.send(message);
+      event.preventDefault();
+      $('#chatMessage').val('');    
     }
   });
-  app.fetch();
+
+  setInterval(() => {
+    app.clearMessages(); 
+    app.fetch();
+  }, 3000);
+
   // fetch and display data
   // console.log(app.data);
   // app.data.forEach(function(item) {
