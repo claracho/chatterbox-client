@@ -3,12 +3,15 @@
   <head>
     <meta charset="utf-8">
     <title>chatterbox</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
     <link rel="stylesheet" href="styles/styles.css">
 
     <!-- dependencies -->
     <script src="bower_components/jquery/dist/jquery.js"></script>
     <script src="bower_components/underscore/underscore-min.js"></script>
-<!--   <script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    <script>
       // YOU DO NOT NEED TO EDIT THIS CODE
       if (!/(&|\?)username=/.test(window.location.search)) {
         var newSearch = window.location.search;
@@ -18,20 +21,27 @@
         newSearch += 'username=' + (prompt('What is your name?') || 'anonymous');
         window.location.search = newSearch;
       }
-    </script> -->
+    </script>
     <!-- your scripts -->
     <script src="env/config.js"></script>
     <script src="scripts/app.js"></script>
   </head>
   <body>
-    <div id="main">
-      <h1>chatterbox</h1>
-      <!-- Your HTML goes here! -->
+    <div id="mainContainer">
+    <h1>chatterbox</h1>
+    <div id="main" class="d-flex flex-row flex-wrap">
+      <div id="chats" class="w-75 h-80 pre-scrollable"></div>
+      <div id="sideDrawer" class="w-25">  
+        <div id="roomList" class="h-50">rooms</div>
+        <div id="friendsList" class="h-50">friends</div>
+      </div>
+      <div class="w-75 h-20">
+        <form id="chatInput">
+          message:
+          <input id="chatMessage" class="w-100" type="text" name="newMessage">
+        </form>
+      </div>
     </div>
-    <form id="chatInput">
-      message:
-      <input id="chatMessage" type="text" name="newMessage">
-    </form>
-    <div id="chats"></div>
+    </div>
   </body>
 </html>

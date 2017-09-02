@@ -38,14 +38,14 @@
       
     X input field for collecting messages
     X  button for posting message
-    refresh functionality
+    X refresh functionality
     way to display existing rooms
       enter existing rooms
     way to create rooms
     display current users
       friend button
       
-    messages need to be in an object
+    X messages need to be in an object
       CSS to bold friend messages
       
       
@@ -97,9 +97,18 @@ class App {
       url: url,
       success: function(ajaxResponse) {
         for (var i = 0; i < ajaxResponse.results.length; i++) {
-          var post = ajaxResponse.results[i];
-          var $post = something(post);
-          $('#chats').append('<p class="post">', $post, '</p>');
+          var chat = ajaxResponse.results[i];
+          var $chat = something(chat);
+          // make a name object with anchor tag
+          // append name node to #chats
+            //append the rest of the message the name node
+          var $chatmessagebox = $('<div class="chat"></div>');
+          $chatmessagebox.append($chat);
+          $('#chats').append($chatmessagebox);
+          
+
+          // <div class="chat roomname"><div class="username">USER</div>TEXTTEXTTEXT</div>
+
         }
       }
     });
@@ -131,7 +140,7 @@ $('document').ready(function() {
     if (event.keyCode === 13) {
       values = $('#chatMessage').val();
       var message = {};
-      message.username = 'Jon';
+      message.username = window.location.search.slice(10);
       message.roomname = '4chan';
       message.text = values;
       app.send(message);
@@ -140,10 +149,10 @@ $('document').ready(function() {
     }
   });
 
-  setInterval(() => {
+  // setInterval(() => {
     app.clearMessages(); 
     app.fetch();
-  }, 3000);
+  // }, 3000);
 
   // fetch and display data
   // console.log(app.data);
