@@ -58,13 +58,65 @@
 */
 const url = 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages';
 
+var makeNode = function(chat) {
+  var name = chat.username;
+  var room = chat.roomname;
+  var message = chat.text;
+  var time = chat.createdAt; // immune to XSS attack
+  var id = chat.objectId;    // immune to XSS attack
+
+  var $chat = document.createTextNode(name + ' in ' + room + ' said ' + message + ' at ' + time);
+  var $chatMsgBox = $('<div class="chat" id="' + id + '"></div>');
+
+  return $chatMsgBox.append($chat);
+};
+
+
 class App {
   constructor () {
     this.server = url;
   }
 
   init() {
+    var makeNode = function(chat) {
+      var name = chat.username;
+      var room = chat.roomname;
+      var message = chat.text;
+      var time = chat.createdAt; // immune to XSS attack
+      var id = chat.objectId;    // immune to XSS attack
+      var $chat = document.createTextNode(name + ' in ' + room + ' said ' + message + ' at ' + time);
+      var $chatMsgBox = $('<div class="chat ' + room + '" id="' + id + '"></div>');
+      return $chatMsgBox.append($chat);
+    };
 
+    var results;
+
+    $.ajax({
+      type: 'GET',
+      //data: 'where={"username": "Jon"}', 
+      data: {'order': '-createdAt'},
+      url: url,
+      success: function(ajaxResponse) {
+        var roomNames = {};
+        for (var i = ajaxResponse.results.length - 1; i >= 0; i--) {
+          var chat = ajaxResponse.results[i];
+          $('#chats').append(makeNode.call(app, chat));
+          roomNames[ajaxResponse.results[i].roomname] = ajaxResponse.results[i].roomname;
+        }
+        $('#chats').scrollTop($('#chats')[0].scrollHeight);
+
+        for (var room in roomNames) {
+          var $room = $('<div class="room"></div>');
+          $room.append(document.createTextNode(room));
+          $('#roomList').append($room);
+        }
+
+        $('.room').on('click', function(event) {  
+          app.renderRoom($(event.target).text());
+        });
+
+      }
+    });
   }
 
   send(message) {
@@ -82,40 +134,26 @@ class App {
   }
 
   fetch() {
-    var something = function(item) {
-      var name = item.username;
-      var room = item.roomname;
-      var message = item.text;
-      var time = item.createdAt;
-      
-      return document.createTextNode(name + ' in ' + room + ' said ' + message + ' at ' + time);
-    };
     $.ajax({
       type: 'GET',
       //data: 'where={"username": "Jon"}', 
       data: {'order': '-createdAt'},
       url: url,
       success: function(ajaxResponse) {
-        for (var i = 0; i < ajaxResponse.results.length; i++) {
+        for (var i = ajaxResponse.results.length - 1; i >= 0; i--) {
           var chat = ajaxResponse.results[i];
-          var $chat = something(chat);
-          // make a name object with anchor tag
-          // append name node to #chats
-            //append the rest of the message the name node
-          var $chatmessagebox = $('<div class="chat"></div>');
-          $chatmessagebox.append($chat);
-          $('#chats').append($chatmessagebox);
-          
-
-          // <div class="chat roomname"><div class="username">USER</div>TEXTTEXTTEXT</div>
-
+          var idLength = $('#' + chat.objectId).length;
+          if (idLength === 0) {
+            $('#chats').append(makeNode(chat));
+          }
         }
+        $('#chats').scrollTop($('#chats')[0].scrollHeight);
       }
     });
   }
 
-  clearMessages() {
-    $('#chats').empty();
+  clearMessages(id) {
+    $(id).empty();
   }
   
   renderMessage(message) {
@@ -123,8 +161,27 @@ class App {
 
   }
   
-  renderRoom(room) {
-    $('#roomSelect').append(`<div>${room}</div>`);
+  renderRoom(roomname) {
+    var $room = $('.' + roomname);
+    $('.chat').not($room).hide();
+    $($room).show();
+    $('#chats').scrollTop($('#chats')[0].scrollHeight);
+    // this.clearMessages('#chats');
+    // $.ajax({
+    //   type: 'GET',
+    //   data: 'where={"roomname": "' + roomname + '"}',
+    //   url: url,
+    //   success: function(ajaxResponse) {
+    //     for (var i = ajaxResponse.results.length - 1; i >= 0; i--) {
+    //       var chat = ajaxResponse.results[i];
+    //       var idLength = $('#' + chat.objectId).length;
+    //       if (idLength === 0) {
+    //         $('#chats').append(makeNode(chat));
+    //       }
+    //     }
+    //     $('#chats').scrollTop($('#chats')[0].scrollHeight);
+    //   }
+    // });
   }
 
 }
@@ -134,7 +191,9 @@ var app = new App();
 
 $('document').ready(function() {
   var values;
-
+  
+  app.init();
+  
   // send message when return key is pressed
   $('#chatInput').on('keypress', function(event) {
     if (event.keyCode === 13) {
@@ -145,14 +204,16 @@ $('document').ready(function() {
       message.text = values;
       app.send(message);
       event.preventDefault();
-      $('#chatMessage').val('');    
+      $('#chatMessage').val('');
+      app.fetch();    
     }
   });
 
+
+
   // setInterval(() => {
-    app.clearMessages(); 
-    app.fetch();
-  // }, 3000);
+  //   app.fetch();
+  // }, 30000);
 
   // fetch and display data
   // console.log(app.data);
