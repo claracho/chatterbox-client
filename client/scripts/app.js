@@ -39,17 +39,17 @@
     X input field for collecting messages
     X  button for posting message
     X refresh functionality
-    way to display existing rooms
-      enter existing rooms
-    way to create rooms
+    X way to display existing rooms
+    X   enter existing rooms
+    X way to create rooms
     display current users
-      friend button
+    X  friend button
       
     X messages need to be in an object
-      CSS to bold friend messages
+    X  CSS to bold friend messages
       
       
-    Style the page
+    X Style the page
     
     -----------------
     maybe change username
@@ -85,7 +85,7 @@ class App {
       var time = chat.createdAt; // immune to XSS attack
       var id = chat.objectId;    // immune to XSS attack
       var $chat = document.createTextNode(name + ' in ' + room + ' said ' + message + ' at ' + time);
-      var $chatMsgBox = $('<div class="chat ' + room + '" id="' + id + '"></div>');
+      var $chatMsgBox = $('<div class="chat ' + room + ' ' + name + '" id="' + id + '" data-username="' + name + '"></div>');
       return $chatMsgBox.append($chat);
     };
 
@@ -104,7 +104,12 @@ class App {
           roomNames[ajaxResponse.results[i].roomname] = ajaxResponse.results[i].roomname;
         }
         $('#chats').scrollTop($('#chats')[0].scrollHeight);
-
+        
+          $('.chat').on('click', function(event) {
+            var user = $(event.target).data("username");
+            $('.' + user).addClass('friend');
+          });
+      
         for (var room in roomNames) {
           var $room = $('<div class="room"></div>');
           $room.append(document.createTextNode(room));
@@ -191,6 +196,7 @@ var app = new App();
 
 $('document').ready(function() {
   var values;
+
   
   app.init();
   
@@ -208,6 +214,9 @@ $('document').ready(function() {
       app.fetch();    
     }
   });
+
+  
+
 
 
 

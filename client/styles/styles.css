@@ -5,7 +5,7 @@ body {
 }
 
 #mainContainer {
-    height: 100vh;
+    
 }
 
 #main {
@@ -46,7 +46,7 @@ body {
 
 
 .friend {
-    color: #fff;
-    background-color: #0090da;
+    color: #fff !important;
+    background-color: #0090da !important;
 }
 
